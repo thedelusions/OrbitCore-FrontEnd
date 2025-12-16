@@ -5,7 +5,7 @@ import { UserContext } from '../../contexts/UserContext';
 import Footer from '../Footer/Footer';
 import './LoginForm.css';
 
-const SignIn = () => {
+const Login = () => {
   const navigate = useNavigate();
   const { setUser } = useContext(UserContext);
   const [message, setMessage] = useState('');
@@ -95,4 +95,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default Login;
