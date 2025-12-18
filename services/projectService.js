@@ -114,3 +114,27 @@ export const downvoteProject = async (projectId, userId) => {
     throw err;
   }
 };
+
+export const updateProject = async (projectId, projectData) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${BASE_URL}/${projectId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(projectData)
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Failed to update project');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    throw err;
+  }
+};
