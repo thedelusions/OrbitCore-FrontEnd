@@ -11,6 +11,8 @@ import Landing from './components/Landing/Landing';
 import Home from './components/Home/Home';
 import Projects from './components/Projects/Projects';
 import ProjectDetail from './components/ProjectDetail/ProjectDetail';
+import CreateProject from './components/CreateProject/CreateProject';
+import EditProject from './components/EditProject/EditProject';
 
 
 
@@ -37,7 +39,9 @@ const App = () => {
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/login" element={<Login />} />
           <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/new" element={<CreateProject />} />
           <Route path="/projects/:id" element={<ProjectDetail />} />
+          <Route path="/projects/:id/edit" element={<EditProject />} />
         </Routes>
       </main>
     </>

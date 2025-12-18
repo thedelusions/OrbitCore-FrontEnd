@@ -17,7 +17,7 @@ const Home = () => {
 
         <div className='hero-actions'>
           <button className='btn btn-primary' onClick={() => navigate('/projects')}>Browse Projects</button>
-          <button className='btn btn-secondary' onClick={() => navigate('/ideas/new')}>Post an Idea</button>
+          <button className='btn btn-secondary' onClick={() => navigate('/projects/new')}>Post a Project</button>
         </div>
         </section>
     </div>
