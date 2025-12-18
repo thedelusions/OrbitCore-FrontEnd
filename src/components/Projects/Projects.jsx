@@ -10,6 +10,8 @@ const Projects = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('newest');
+  const [filterStatus, setFilterStatus] = useState('all');
 
   useEffect(() => {
     fetchProjects();
@@ -28,14 +30,31 @@ const Projects = () => {
     }
   };
 
-  const filteredProjects = projects.filter(project => {
-    const tagsArray = typeof project.tags === 'string' ? project.tags.split(',') : project.tags || [];
-    const tagsString = tagsArray.join(' ').toLowerCase();
-    
-    return project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tagsString.includes(searchTerm.toLowerCase());
-  });
+  const filteredProjects = projects
+    .filter(project => {
+      const tagsArray = typeof project.tags === 'string' ? project.tags.split(',') : project.tags || [];
+      const tagsString = tagsArray.join(' ').toLowerCase();
+      
+      const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tagsString.includes(searchTerm.toLowerCase());
+      
+      const matchesStatus = filterStatus === 'all' || project.status === filterStatus;
+      
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'newest':
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        case 'oldest':
+          return new Date(a.createdAt) - new Date(b.createdAt);
+        case 'most-upvoted':
+          return (b.upvotes || 0) - (a.upvotes || 0);
+        default:
+          return 0;
+      }
+    });
 
   return (
     <>
@@ -52,6 +71,28 @@ const Projects = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
             />
+            
+            <select 
+              className="filter-select"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="most-upvoted">Most Upvoted</option>
+            </select>
+            
+            <select 
+              className="filter-select"
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+            >
+              <option value="all">All Status</option>
+              <option value="open">Open</option>
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+            
             <button 
               className="btn btn-primary"
               onClick={() => navigate('/projects/new')}
