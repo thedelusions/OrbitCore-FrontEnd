@@ -3,17 +3,21 @@ import { useNavigate } from 'react-router';
 import { createProject } from '../../../services/projectService';
 import { UserContext } from '../../contexts/UserContext';
 import Footer from '../Footer/Footer';
+import tagsData from '../../../data/tags.json';
 import './CreateProject.css';
+
+const AVAILABLE_TAGS = tagsData.tags;
 
 const CreateProject = () => {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const [error, setError] = useState('');
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     status: 'open',
-    tags: '',
     repo_link: ''
   });
 
@@ -22,6 +26,18 @@ const CreateProject = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleTagToggle = (tag) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  const handleRemoveTag = (tag) => {
+    setSelectedTags(prev => prev.filter(t => t !== tag));
   };
 
   const handleSubmit = async (e) => {
@@ -44,7 +60,7 @@ const CreateProject = () => {
         description: formData.description,
         ownerId: userId,
         status: formData.status,
-        tags: formData.tags || null,
+        tags: selectedTags.length > 0 ? selectedTags.join(',') : null,
         repo_link: formData.repo_link || null
       };
 
@@ -127,16 +143,45 @@ const CreateProject = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="tags">Tags</label>
-            <input
-              type="text"
-              id="tags"
-              name="tags"
-              value={formData.tags}
-              onChange={handleChange}
-              placeholder="Web,AI,Mobile (comma-separated)"
-            />
-            <small className="form-hint">Separate tags with commas</small>
+            <label>Tags</label>
+            <div className="tags-selector">
+              <div className="selected-tags">
+                {selectedTags.map(tag => (
+                  <span key={tag} className="selected-tag">
+                    {tag}
+                    <button 
+                      type="button" 
+                      className="remove-tag"
+                      onClick={() => handleRemoveTag(tag)}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                <button 
+                  type="button" 
+                  className="add-tag-button"
+                  onClick={() => setShowTagDropdown(!showTagDropdown)}
+                >
+                  + Add Tag
+                </button>
+              </div>
+              {showTagDropdown && (
+                <div className="tag-dropdown">
+                  {AVAILABLE_TAGS.map(tag => (
+                    <label key={tag} className="tag-option">
+                      <input
+                        type="checkbox"
+                        checked={selectedTags.includes(tag)}
+                        onChange={() => handleTagToggle(tag)}
+                      />
+                      <span>{tag}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+            <small className="form-hint">Select one or more tags</small>
           </div>
 
           <div className="form-group">

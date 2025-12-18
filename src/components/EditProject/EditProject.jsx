@@ -3,7 +3,10 @@ import { useParams, useNavigate } from 'react-router';
 import { getProject, updateProject } from '../../../services/projectService';
 import { UserContext } from '../../contexts/UserContext';
 import Footer from '../Footer/Footer';
+import tagsData from '../../../data/tags.json';
 import './EditProject.css';
+
+const AVAILABLE_TAGS = tagsData.tags;
 
 const EditProject = () => {
   const { id } = useParams();
@@ -11,11 +14,12 @@ const EditProject = () => {
   const { user } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     status: 'open',
-    tags: '',
     repo_link: ''
   });
 
@@ -40,9 +44,15 @@ const EditProject = () => {
         title: data.title,
         description: data.description,
         status: data.status,
-        tags: data.tags || '',
         repo_link: data.repo_link || ''
       });
+      
+      // Parse tags string into array
+      if (data.tags) {
+        const tagsArray = data.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+        setSelectedTags(tagsArray);
+      }
+      
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -55,6 +65,18 @@ const EditProject = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleTagToggle = (tag) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  const handleRemoveTag = (tag) => {
+    setSelectedTags(prev => prev.filter(t => t !== tag));
   };
 
   const handleSubmit = async (e) => {
@@ -76,7 +98,7 @@ const EditProject = () => {
         title: formData.title,
         description: formData.description,
         status: formData.status,
-        tags: formData.tags || null,
+        tags: selectedTags.length > 0 ? selectedTags.join(',') : null,
         repo_link: formData.repo_link || null
       };
 
@@ -184,16 +206,45 @@ const EditProject = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="tags">Tags</label>
-            <input
-              type="text"
-              id="tags"
-              name="tags"
-              value={formData.tags}
-              onChange={handleChange}
-              placeholder="Web,AI,Mobile (comma-separated)"
-            />
-            <small className="form-hint">Separate tags with commas</small>
+            <label>Tags</label>
+            <div className="tags-selector">
+              <div className="selected-tags">
+                {selectedTags.map(tag => (
+                  <span key={tag} className="selected-tag">
+                    {tag}
+                    <button 
+                      type="button" 
+                      className="remove-tag"
+                      onClick={() => handleRemoveTag(tag)}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                <button 
+                  type="button" 
+                  className="add-tag-button"
+                  onClick={() => setShowTagDropdown(!showTagDropdown)}
+                >
+                  + Add Tag
+                </button>
+              </div>
+              {showTagDropdown && (
+                <div className="tag-dropdown">
+                  {AVAILABLE_TAGS.map(tag => (
+                    <label key={tag} className="tag-option">
+                      <input
+                        type="checkbox"
+                        checked={selectedTags.includes(tag)}
+                        onChange={() => handleTagToggle(tag)}
+                      />
+                      <span>{tag}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+            <small className="form-hint">Select one or more tags</small>
           </div>
 
           <div className="form-group">
