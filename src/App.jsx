@@ -9,6 +9,8 @@ import RegisterForm from './components/Register/Register';
 import Login from './components/Login/LoginForm';
 import Landing from './components/Landing/Landing';
 import Home from './components/Home/Home';
+import Projects from './components/Projects/Projects';
+import ProjectDetail from './components/ProjectDetail/ProjectDetail';
 
 
 
@@ -20,20 +22,24 @@ const App = () => {
     <>
       <NavBar />
 
-      <Routes>
-        {user ? (
-          <>
-            <Route path="/" element={<Home />} />
-          </>
-        ) : (
-          <>
-            <Route path="/" element={<Landing />} />
-          </>
-        )}
+      <main className="main-content">
+        <Routes>
+          {user ? (
+            <>
+              <Route path="/" element={<Home />} />
+            </>
+          ) : (
+            <>
+              <Route path="/" element={<Landing />} />
+            </>
+          )}
 
-        <Route path="/register" element={<RegisterForm />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
+          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:id" element={<ProjectDetail />} />
+        </Routes>
+      </main>
     </>
   );
 };
