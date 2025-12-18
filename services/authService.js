@@ -44,11 +44,45 @@ export const signIn = async (credentials) => {
     }
 
     const data = await response.json();
+    
     // Store token
-    localStorage.setItem('token', data.token);
+    if (data.access_token) {
+      localStorage.setItem('token', data.access_token);
+    } else if (data.token) {
+      localStorage.setItem('token', data.token);
+    }
+    
     return data;
   } catch (err) {
     throw err;
+  }
+};
+
+export const getCurrentUser = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      return null;
+    }
+
+    const response = await fetch(`${BASE_URL}/profile`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const userData = await response.json();
+    return userData;
+  } catch (err) {
+    console.error('Error fetching current user:', err);
+    return null;
   }
 };
 
