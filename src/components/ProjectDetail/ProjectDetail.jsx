@@ -1,10 +1,12 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { getProject, upvoteProject, downvoteProject, removeVote } from '../../../services/projectService';
+import { createRequest } from '../../../services/requestService';
 import { getUserById } from '../../../services/userService';
 import { UserContext } from '../../contexts/UserContext';
 import Footer from '../Footer/Footer';
 import './ProjectDetail.css';
+import roles from '../../../data/roles.json';
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -17,10 +19,24 @@ const ProjectDetail = () => {
   const [actionError, setActionError] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [userVoteType, setUserVoteType] = useState(null);
+  const [requestSent, setRequestSent] = useState(false);
+  const [sendingRequest, setSendingRequest] = useState(false);
+  const [message, setMessage] = useState(''); // optional message input
+  const [selectedRole, setSelectedRole] = useState('');
 
   useEffect(() => {
     fetchProject();
   }, [id]);
+
+  useEffect(() => {
+    if (!project || !user) return;
+    const uid = user.id || user.user_id || user.userId;
+    if (!uid) return;
+    const existing = Array.isArray(project.requests)
+      ? project.requests.find(r => r.user_id === uid)
+      : null;
+    setRequestSent(!!existing);
+  }, [project, user]);
 
   const fetchProject = async () => {
     try {
@@ -65,13 +81,11 @@ const ProjectDetail = () => {
         setProject(updatedProject);
         setUserVoteType(null);
       } else {
-
         const updatedProject = await upvoteProject(id, userId);
         setProject(updatedProject);
         setUserVoteType('upvote');
       }
     } catch (err) {
-    
       if (err.message.includes('already upvoted')) {
         try {
           const updatedProject = await removeVote(id, userId);
@@ -99,19 +113,16 @@ const ProjectDetail = () => {
     try {
       setActionError('');
       
-     
       if (userVoteType === 'downvote') {
         const updatedProject = await removeVote(id, userId);
         setProject(updatedProject);
         setUserVoteType(null);
       } else {
-        
         const updatedProject = await downvoteProject(id, userId);
         setProject(updatedProject);
         setUserVoteType('downvote');
       }
     } catch (err) {
-      
       if (err.message.includes('already downvoted')) {
         try {
           const updatedProject = await removeVote(id, userId);
@@ -145,6 +156,41 @@ const ProjectDetail = () => {
     } catch (err) {
       setActionError(err.message);
       setShowDeleteConfirm(false);
+    }
+  };
+
+  const handleSendJoinRequest = async () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    const uid = user.id || user.user_id || user.userId;
+    if (!uid) {
+      setActionError('User ID not found. Please log in again.');
+      return;
+    }
+
+    if (requestSent) return;
+
+    try {
+      setSendingRequest(true);
+      if (!selectedRole) {
+        setActionError('Please choose a role before sending your request.');
+        setSendingRequest(false);
+        return;
+      }
+      const created = await createRequest(id, message || null, selectedRole); // send role + optional message
+      setRequestSent(true);
+      setProject(prev => ({ ...prev, requests: prev?.requests ? [...prev.requests, created] : [created] }));
+      setMessage(''); // clear input after sending
+      setSelectedRole('');
+      setActionError('');
+    } catch (err) {
+      const msg = err?.message || 'Failed to send request';
+      setActionError(msg);
+    } finally {
+      setSendingRequest(false);
     }
   };
 
@@ -287,14 +333,50 @@ const ProjectDetail = () => {
               <button className="btn btn-primary" onClick={() => navigate(`/projects/${id}/edit`)}>
                 Edit Project
               </button>
+              <button className="btn btn-secondary" onClick={() => navigate(`/projects/${id}/requests`)}>
+                View Join Requests
+              </button>
               <button className="btn btn-delete" onClick={() => setShowDeleteConfirm(true)}>
                 Delete Project
               </button>
             </div>
           ) : user ? (
             <div className="project-actions">
-              <button className="btn btn-primary">
-                Join the Mission
+              <div className="role-row">
+                <select
+                  className="role-select"
+                  value={selectedRole}
+                  onChange={(e) => setSelectedRole(e.target.value)}
+                >
+                  <option value="">Select role to apply for</option>
+                  {(project.roles && project.roles.length > 0
+                    ? project.roles
+                    : Object.values(roles).flat().sort()
+                  ).map((r) => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+                <button
+                  className="btn btn-secondary"
+                  type="button"
+                  onClick={() => { setSelectedRole(''); setMessage(''); }}
+                >
+                  Clear
+                </button>
+              </div>
+              <textarea
+                className="request-message"
+                placeholder="Optional message (explain why you want to join / relevant experience)"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                rows={3}
+              />
+              <button
+                className="btn btn-primary"
+                onClick={handleSendJoinRequest}
+                disabled={requestSent || sendingRequest || !selectedRole}
+              >
+                {requestSent ? 'Request Sent' : sendingRequest ? 'Sending...' : 'Join Project'}
               </button>
             </div>
           ) : null}
