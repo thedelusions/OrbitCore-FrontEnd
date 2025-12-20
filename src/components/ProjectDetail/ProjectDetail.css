@@ -136,9 +136,21 @@
   color: #4ade80;
 }
 
+.upvote-button.active {
+  background: #4ade80;
+  border-color: #4ade80;
+  color: #060609;
+}
+
 .downvote-button:hover:not(:disabled) {
   border-color: #ef4444;
   color: #ef4444;
+}
+
+.downvote-button.active {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #060609;
 }
 
 .project-tags-detail {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { getProject, upvoteProject, downvoteProject } from '../../../services/projectService';
+import { getProject, upvoteProject, downvoteProject, removeVote } from '../../../services/projectService';
 import { getUserById } from '../../../services/userService';
 import { UserContext } from '../../contexts/UserContext';
 import Footer from '../Footer/Footer';
@@ -16,6 +16,7 @@ const ProjectDetail = () => {
   const [error, setError] = useState('');
   const [actionError, setActionError] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [userVoteType, setUserVoteType] = useState(null);
 
   useEffect(() => {
     fetchProject();
@@ -58,10 +59,30 @@ const ProjectDetail = () => {
     }
     try {
       setActionError('');
-      const updatedProject = await upvoteProject(id, userId);
-      setProject(updatedProject);
+      
+      if (userVoteType === 'upvote') {
+        const updatedProject = await removeVote(id, userId);
+        setProject(updatedProject);
+        setUserVoteType(null);
+      } else {
+
+        const updatedProject = await upvoteProject(id, userId);
+        setProject(updatedProject);
+        setUserVoteType('upvote');
+      }
     } catch (err) {
-      setActionError(err.message);
+    
+      if (err.message.includes('already upvoted')) {
+        try {
+          const updatedProject = await removeVote(id, userId);
+          setProject(updatedProject);
+          setUserVoteType(null);
+        } catch (removeErr) {
+          setActionError(removeErr.message);
+        }
+      } else {
+        setActionError(err.message);
+      }
     }
   };
 
@@ -77,10 +98,31 @@ const ProjectDetail = () => {
     }
     try {
       setActionError('');
-      const updatedProject = await downvoteProject(id, userId);
-      setProject(updatedProject);
+      
+     
+      if (userVoteType === 'downvote') {
+        const updatedProject = await removeVote(id, userId);
+        setProject(updatedProject);
+        setUserVoteType(null);
+      } else {
+        
+        const updatedProject = await downvoteProject(id, userId);
+        setProject(updatedProject);
+        setUserVoteType('downvote');
+      }
     } catch (err) {
-      setActionError(err.message);
+      
+      if (err.message.includes('already downvoted')) {
+        try {
+          const updatedProject = await removeVote(id, userId);
+          setProject(updatedProject);
+          setUserVoteType(null);
+        } catch (removeErr) {
+          setActionError(removeErr.message);
+        }
+      } else {
+        setActionError(err.message);
+      }
     }
   };
 
@@ -172,14 +214,14 @@ const ProjectDetail = () => {
 
           <div className="project-votes">
             <button 
-              className="vote-button upvote-button" 
+              className={`vote-button upvote-button ${userVoteType === 'upvote' ? 'active' : ''}`}
               onClick={handleUpvote}
               disabled={!user}
             >
               ↑ {project.upvotes || 0}
             </button>
             <button 
-              className="vote-button downvote-button" 
+              className={`vote-button downvote-button ${userVoteType === 'downvote' ? 'active' : ''}`}
               onClick={handleDownvote}
               disabled={!user}
             >

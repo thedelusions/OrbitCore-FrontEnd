@@ -115,6 +115,29 @@ export const downvoteProject = async (projectId, userId) => {
   }
 };
 
+export const removeVote = async (projectId, userId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${BASE_URL}/${projectId}/vote/${userId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Failed to remove vote');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const updateProject = async (projectId, projectData) => {
   try {
     const token = localStorage.getItem('token');
