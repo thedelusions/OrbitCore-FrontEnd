@@ -28,6 +28,7 @@ const NavBar = () => {
           <li><Link to='/projects' onClick={handleLinkClick}>Projects</Link></li>
           {user ? (
             <>
+              <li><Link to='/my/requests' onClick={handleLinkClick}>My Requests</Link></li>
               <li><Link to='/' onClick={handleLinkClick}>Home</Link></li>
               <li><Link to="/" onClick={handleSignOut}>Sign Out</Link></li>
             </>
