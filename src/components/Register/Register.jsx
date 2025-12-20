@@ -32,11 +32,23 @@ const RegisterForm = () => {
     try {
       const data = await signUp(formData);
       console.log('Registration response:', data);
-      // Store user data if it's returned
-      if (data.user) {
-        setUser(data.user);
+      
+      if (data.token || data.access_token) {
+        const token = data.token || data.access_token;
+        localStorage.setItem('token', token);
       }
-      navigate('/login');
+      
+      // Store user data
+      if (data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setUser(data.user);
+      } else if (data.username) {
+        // If user data is directly in response
+        localStorage.setItem('user', JSON.stringify(data));
+        setUser(data);
+      }
+      
+      navigate('/');
     } catch (err) {
       setMessage(err.message);
     }
