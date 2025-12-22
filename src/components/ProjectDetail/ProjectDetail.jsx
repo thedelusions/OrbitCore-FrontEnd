@@ -330,6 +330,9 @@ const ProjectDetail = () => {
 
           {user && (user.id === project.ownerId || user.user_id === project.ownerId || user.userId === project.ownerId) ? (
             <div className="owner-actions">
+              <button className="btn btn-primary" onClick={() => navigate(`/projects/${id}/team`)}>
+                View Team
+            </button>
               <button className="btn btn-primary" onClick={() => navigate(`/projects/${id}/edit`)}>
                 Edit Project
               </button>

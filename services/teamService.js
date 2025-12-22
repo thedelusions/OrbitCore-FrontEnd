@@ -1,6 +1,6 @@
 const BASE_URL = 'http://127.0.0.1:8000/api';
 
-const getTeamMembers = async (projectId) => {
+export const getTeamMembers = async (projectId) => {
   try {
     const token = localStorage.getItem('token');
     const headers = { 'Content-Type': 'application/json' };
@@ -27,7 +27,7 @@ const getTeamMembers = async (projectId) => {
   }
 };
 
-const removeTeamMember = async (projectId, userId) => {
+export const removeTeamMember = async (projectId, userId) => {
   try {
     const token = localStorage.getItem('token');
     const response = await fetch(`${BASE_URL}/projects/${projectId}/team/${userId}`, {
@@ -50,7 +50,7 @@ const removeTeamMember = async (projectId, userId) => {
   }
 };
 
-const getTeamComments = async (projectId) => {
+export const getTeamComments = async (projectId) => {
   try {
     const token = localStorage.getItem('token');
     const response = await fetch(`${BASE_URL}/projects/${projectId}/team/comments`, {
@@ -73,7 +73,7 @@ const getTeamComments = async (projectId) => {
   }
 };
 
-const addTeamComment = async (projectId, commentData) => {
+export const addTeamComment = async (projectId, commentData) => {
   try {
     const token = localStorage.getItem('token');
     const response = await fetch(`${BASE_URL}/projects/${projectId}/team/comments`, {
@@ -97,9 +97,29 @@ const addTeamComment = async (projectId, commentData) => {
     throw err;
   }
 };
-export default {
-  getTeamMembers,
-  removeTeamMember,
-  getTeamComments,
-  addTeamComment
-}
+
+export const getProjectTeam = async (projectId) => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await fetch(
+      `http://127.0.0.1:8000/api/projects/${projectId}/team`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Failed to fetch project team');
+    }
+
+    return await response.json();
+  } catch (err) {
+    console.error('Error fetching project team:', err.message);
+    throw err;
+  }
+};

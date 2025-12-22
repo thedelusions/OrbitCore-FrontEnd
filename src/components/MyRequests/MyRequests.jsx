@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import Footer from '../Footer/Footer';
 import './MyRequests.css';
 import { getMyRequests } from '../../../services/requestService';
@@ -7,6 +7,7 @@ import { UserContext } from '../../contexts/UserContext';
 
 const MyRequests = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const { user } = useContext(UserContext);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,6 +73,13 @@ const MyRequests = () => {
                   <span className="col-value">{new Date(r.created_at).toLocaleString()}</span>
                 </div>
               </div>
+              {r.status === 'accepted' && (
+                <div className="request-actions">
+                  <button className="btn btn-primary" onClick={() => navigate(`/projects/${r.project.id}/team`)}>
+                View Team
+              </button>
+                </div>
+              )}
             </div>
           ))}
         </div>

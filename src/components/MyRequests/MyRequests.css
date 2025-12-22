@@ -101,3 +101,28 @@
 .back-button:hover {
   color: #f4f4f4;
 }
+
+.request-actions {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #2a2a2f;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.view-team-btn {
+  background: #ff6b35;
+  color: #f4f4f4;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-team-btn:hover {
+  background: #ff8c42;
+  transform: translateY(-1px);
+}

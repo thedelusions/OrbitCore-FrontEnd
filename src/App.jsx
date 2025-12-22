@@ -15,7 +15,7 @@ import CreateProject from './components/CreateProject/CreateProject';
 import EditProject from './components/EditProject/EditProject';
 import ProjectRequests from './components/ProjectRequests/ProjectRequests';
 import MyRequests from './components/MyRequests/MyRequests';
-
+import Team from './components/Team/Team'
 
 
 const App = () => {
@@ -46,6 +46,7 @@ const App = () => {
           <Route path="/projects/:id/edit" element={<EditProject />} />
           <Route path="/projects/:id/requests" element={<ProjectRequests />} />
           <Route path="/my/requests" element={<MyRequests />} />
+          <Route path="/projects/:id/team" element={<Team />} />
         </Routes>
       </main>
     </>
