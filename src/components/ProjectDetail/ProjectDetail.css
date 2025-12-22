@@ -270,6 +270,45 @@
   border-top: 1px solid #2a2a2f;
 }
 
+/* Role selector and message styles for join request */
+.project-actions .role-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.project-actions .role-select {
+  padding: 10px 12px;
+  background: #1a1a1f;
+  border: 2px solid #2a2a2f;
+  border-radius: 8px;
+  color: #f4f4f4;
+  font-size: 14px;
+}
+
+.project-actions .role-select:focus {
+  outline: none;
+  border-color: #ff6b35;
+}
+
+.project-actions .request-message {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 12px 14px;
+  background: #1a1a1f;
+  border: 2px solid #2a2a2f;
+  border-radius: 8px;
+  color: #f4f4f4;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.project-actions .request-message:focus {
+  outline: none;
+  border-color: #ff6b35;
+}
+
 .btn {
   padding: 12px 24px;
   border-radius: 8px;

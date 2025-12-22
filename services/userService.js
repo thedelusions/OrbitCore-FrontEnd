@@ -18,3 +18,4 @@ export const getUserById = async (userId) => {
     throw err;
   }
 };
+
