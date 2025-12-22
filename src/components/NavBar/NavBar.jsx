@@ -29,6 +29,7 @@ const NavBar = () => {
           {user ? (
             <>
               <li><Link to='/' onClick={handleLinkClick}>Home</Link></li>
+              <li><Link to='/profile' onClick={handleLinkClick}>Profile</Link></li>
               <li><Link to="/" onClick={handleSignOut}>Sign Out</Link></li>
             </>
           ) : (
