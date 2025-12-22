@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router";
-import { getProjectTeam } from "../../../services/teamService";
+import { getProjectTeam} from "../../../services/teamService";
 import './Team.css';
 
 const Team = () => {
