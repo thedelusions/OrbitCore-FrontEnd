@@ -73,7 +73,7 @@ const ProjectRequests = () => {
                 </div>
                 <div className="detail-item">
                   <span className="detail-label">Applied Date:</span>
-                  <span className="detail-value">{new Date(r.created_at).toLocaleString()}</span>
+                  <span className="detail-value">{new Date(r.createdAt).toLocaleString()}</span>
                 </div>
               </div>
               {r.message && (

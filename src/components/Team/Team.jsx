@@ -37,17 +37,16 @@ const Team = () => {
       <h1>Team Members</h1>
       <div className="team-grid">
         {teamMembers.map((member) => (
-          <div key={`${member.projectId}-${member.id}`} className="team-member-card">
-            <h3>{member.username}</h3>
-            <p><strong>Email:</strong> {member.email}</p>
-            <p><strong>Project:</strong> {member.projectTitle}</p>
-            {member.role && <p><strong>Role:</strong> {member.role}</p>}
-            {member.bio && <p><strong>Bio:</strong> {member.bio}</p>}
-            {member.github_profile && (
+          <div key={`${member.project_id}-${member.user_id}`} className="team-member-card">
+            <h3>{member.user?.username}</h3>
+            <p><strong>Email:</strong> {member.user?.email}</p>
+            <p><strong>Role:</strong> {member.role}</p>
+            {member.user?.bio && <p><strong>Bio:</strong> {member.user.bio}</p>}
+            {member.user?.github_profile && (
               <p>
-                <strong>GitHub:</strong>
-                <a href={member.github_profile} target="_blank" rel="noopener noreferrer">
-                  {member.github_profile}
+                
+                <a href={member.user.github_profile} target="_blank" rel="noopener noreferrer">
+                Github Profile Link
                 </a>
               </p>
             )}
