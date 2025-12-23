@@ -48,11 +48,23 @@ const Team = () => {
     member.role === 'Owner' &&
     member.user_id === (user?.id || user?.user_id || user?.userId)
 );
+const handleAddingComment = async (e) => {
+  e.preventDefault();
+  try {
+    const newComment = await addTeamComment(id, {content: commentText})
+    setComments(prev => [...prev, newComment])
+    setCommentText("")
+  }
+  catch (err) {
+    alert(err.message)
+  }
+}
   if (loading) return <div className="loading">Loading team...</div>;
   if (error) return <div className="error">Error: {error}</div>;
 
   return (
-    <><div className="team-container">
+    <>
+    <div className="team-container">
       <h1>Team Members</h1>
       <div className="team-grid">
         {teamMembers.map((member) => (
@@ -81,6 +93,21 @@ const Team = () => {
       {teamMembers.length === 0 && (
         <p className="no-teams">No team members found.</p>
       )}
+      <h2>Team comments</h2>
+      <div className='comments-list'>
+        <div className="comments-list">
+        {comments.map(comment => (
+          <div key={comment.id} className="comment">
+            <strong>{comment.user?.username}</strong>
+            <p>{comment.content}</p>
+          </div>
+        ))}
+      </div> 
+      <form onSubmit={handleAddingComment} className="comment-form">
+        <textarea value={commentText} onChange={e => setCommentText(e.target.value)} placeholder="Write a comment..."/>
+        <button type="submit">Add Comment</button>
+      </form>
+      </div>
     </div>
     <Footer />
     </>
