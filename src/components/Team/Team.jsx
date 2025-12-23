@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from "react-router";
 import { getProjectTeam, removeTeamMember, getTeamComments, addTeamComment} from "../../../services/teamService";
+import { UserContext } from '../../contexts/UserContext';
 import './Team.css';
 import Footer from '../Footer/Footer';
 const Team = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const { user } = useContext(UserContext);
   const [teamMembers, setTeamMembers] = useState([]);
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
@@ -42,6 +43,11 @@ const Team = () => {
       alert(err.message)
     }
   }
+  const isOwner = teamMembers.some(
+  member =>
+    member.role === 'Owner' &&
+    member.user_id === (user?.id || user?.user_id || user?.userId)
+);
   if (loading) return <div className="loading">Loading team...</div>;
   if (error) return <div className="error">Error: {error}</div>;
 
@@ -63,7 +69,7 @@ const Team = () => {
                 </a>
               </p>
             )}
-            {member.role !== 'owner' && isOwner && (
+            {member.role !== 'Owner' && isOwner && (
             <button className='remove-btn' onClick={() => handleRemovingMember(member.user_id)}>
               Remove
             </button>
