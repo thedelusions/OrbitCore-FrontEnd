@@ -1,23 +1,27 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router";
-import { getProjectTeam} from "../../../services/teamService";
+import { getProjectTeam, removeTeamMember, getTeamComments, addTeamComment} from "../../../services/teamService";
 import './Team.css';
-
+import Footer from '../Footer/Footer';
 const Team = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [teamMembers, setTeamMembers] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [commentText, setCommentText] = useState("");
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchTeam = async () => {
+    const fetchTeamInfo = async () => {
       try {
         
-        const data = await getProjectTeam(id);
-        setTeamMembers(data);
-        
+        const teamInfo = await getProjectTeam(id);
+        setTeamMembers(teamInfo);
+        const commentInfo = await getTeamComments(id)
+        setComments(commentInfo)
        
       } catch (err) {
         setError(err.message);
@@ -26,14 +30,23 @@ const Team = () => {
       }
     };
 
-    fetchTeam();
+    fetchTeamInfo();
   }, [id]);
 
+  const handleRemovingMember = async (userId) => {
+    try {
+      await removeTeamMember(id, userId)
+      setTeamMembers(prev => prev.filter(member => member.user_id !== userId))
+    }
+    catch(err) {
+      alert(err.message)
+    }
+  }
   if (loading) return <div className="loading">Loading team...</div>;
   if (error) return <div className="error">Error: {error}</div>;
 
   return (
-    <div className="team-container">
+    <><div className="team-container">
       <h1>Team Members</h1>
       <div className="team-grid">
         {teamMembers.map((member) => (
@@ -50,13 +63,22 @@ const Team = () => {
                 </a>
               </p>
             )}
+            {member.role !== 'owner' && isOwner && (
+            <button className='remove-btn' onClick={() => handleRemovingMember(member.user_id)}>
+              Remove
+            </button>
+            )}
           </div>
         ))}
       </div>
+
       {teamMembers.length === 0 && (
         <p className="no-teams">No team members found.</p>
       )}
     </div>
+    <Footer />
+    </>
+    
   );
 };
 
