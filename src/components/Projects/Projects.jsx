@@ -32,7 +32,7 @@ const Projects = () => {
 
   const filteredProjects = projects
     .filter(project => {
-      const tagsArray = typeof project.tags === 'string' ? project.tags.split(',') : project.tags || [];
+      const tagsArray = Array.isArray(project.tags) ? project.tags : (typeof project.tags === 'string' ? project.tags.split(',') : []);
       const tagsString = tagsArray.join(' ').toLowerCase();
       
       const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -126,10 +126,10 @@ const Projects = () => {
               
               <p className="project-description">{project.description}</p>
               
-              {project.tags && (
+              {project.tags && project.tags.length > 0 && (
                 <div className="project-tags">
-                  {(typeof project.tags === 'string' ? project.tags.split(',') : project.tags).map((tag, index) => (
-                    <span key={index} className="tag">{tag.trim()}</span>
+                  {(Array.isArray(project.tags) ? project.tags : project.tags.split(',')).map((tag, index) => (
+                    <span key={index} className="tag">{typeof tag === 'string' ? tag.trim() : tag}</span>
                   ))}
                 </div>
               )}
