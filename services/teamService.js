@@ -123,3 +123,25 @@ export const getProjectTeam = async (projectId) => {
     throw err;
   }
 };
+export const deleteTeamComment = async (projectId, commentId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${BASE_URL}/projects/${projectId}/team/comments/${commentId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Failed to remove team member');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.error('Error removing team member:', err);
+    throw err;
+  }
+}
