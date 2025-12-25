@@ -92,9 +92,14 @@ const handleDeleteComment = async (commentId) => {
               </p>
             )}
             {member.role !== 'Owner' && isOwner && (
-            <button className='remove-btn' onClick={() => handleRemovingMember(member.user_id)}>
-              Remove
-            </button>
+            <button
+        className="rem-member-button"
+        onClick={() => handleRemovingMember(member.user_id)}
+      >
+        <svg viewBox="0 0 448 512" className="svgIcon">
+          <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
+        </svg>
+      </button>
             )}
           </div>
         ))}
@@ -103,7 +108,7 @@ const handleDeleteComment = async (commentId) => {
       {teamMembers.length === 0 && (
         <p className="no-teams">No team members found.</p>
       )}
-      <h2>Team comments</h2>
+      <h2 className='comments-title'>Discussion</h2>
       <div className='comments-list'>
         <div className="comments-list">
         {comments.map(comment => (
@@ -125,9 +130,14 @@ const handleDeleteComment = async (commentId) => {
 ))}
       </div> 
       <form onSubmit={handleAddingComment} className="comment-form">
-        <textarea value={commentText} onChange={e => setCommentText(e.target.value)} placeholder="Write a comment..."/>
-        <button type="submit">Add Comment</button>
-      </form>
+        <div className="input-container">
+          <textarea value={commentText} onChange={e => setCommentText(e.target.value)} required/>
+          <label className="label">Write a comment...</label>
+          <span className="underline"></span>
+        </div>
+
+  <button type="submit">Add Comment</button>
+</form>
       </div>
     </div>
     <Footer />
