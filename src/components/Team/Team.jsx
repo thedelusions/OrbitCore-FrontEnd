@@ -40,7 +40,7 @@ const Team = () => {
       setTeamMembers(prev => prev.filter(member => member.user_id !== userId))
     }
     catch(err) {
-      alert(err.message)
+      setError(err.message)
     }
   }
   const currentUserId = user?.id || user?.user_id || user?.userId;
@@ -57,7 +57,7 @@ const handleAddingComment = async (e) => {
     setCommentText("")
   }
   catch (err) {
-    alert(err.message)
+    setError(err.message)
   }
 }
 const handleDeleteComment = async (commentId) => {
@@ -66,7 +66,7 @@ const handleDeleteComment = async (commentId) => {
     setComments(prev => prev.filter(c => c.id !== commentId))
   }
   catch (err) {
-    alert(err.message)
+    setError(err.message)
   }
 }
   if (loading) return <div className="loading">Loading team...</div>;
