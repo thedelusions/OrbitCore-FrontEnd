@@ -29,11 +29,15 @@ const CreateProject = () => {
   };
 
   const handleTagToggle = (tag) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    );
+    setSelectedTags(prev => {
+      if (prev.includes(tag)) {
+        return prev.filter(t => t !== tag);
+      } else if (prev.length < 5) {
+        return [...prev, tag];
+      } else {
+        return prev;
+      }
+    });
   };
 
   const handleRemoveTag = (tag) => {
@@ -54,13 +58,23 @@ const CreateProject = () => {
       return;
     }
 
+    if (selectedTags.length === 0) {
+      setError('At least 1 tag is required');
+      return;
+    }
+
+    if (selectedTags.length > 5) {
+      setError('Maximum 5 tags allowed');
+      return;
+    }
+
     try {
       const projectData = {
         title: formData.title,
         description: formData.description,
         ownerId: userId,
         status: formData.status,
-        tags: selectedTags.length > 0 ? selectedTags.join(',') : null,
+        tags: selectedTags,
         repo_link: formData.repo_link || null
       };
 
@@ -143,7 +157,7 @@ const CreateProject = () => {
           </div>
 
           <div className="form-group">
-            <label>Tags</label>
+            <label>Tags (1-5 required) *</label>
             <div className="tags-selector">
               <div className="selected-tags">
                 {selectedTags.map(tag => (
@@ -158,13 +172,15 @@ const CreateProject = () => {
                     </button>
                   </span>
                 ))}
-                <button 
-                  type="button" 
-                  className="add-tag-button"
-                  onClick={() => setShowTagDropdown(!showTagDropdown)}
-                >
-                  + Add Tag
-                </button>
+                {selectedTags.length < 5 && (
+                  <button 
+                    type="button" 
+                    className="add-tag-button"
+                    onClick={() => setShowTagDropdown(!showTagDropdown)}
+                  >
+                    + Add Tag
+                  </button>
+                )}
               </div>
               {showTagDropdown && (
                 <div className="tag-dropdown">
@@ -174,6 +190,7 @@ const CreateProject = () => {
                         type="checkbox"
                         checked={selectedTags.includes(tag)}
                         onChange={() => handleTagToggle(tag)}
+                        disabled={!selectedTags.includes(tag) && selectedTags.length >= 5}
                       />
                       <span>{tag}</span>
                     </label>
@@ -181,7 +198,7 @@ const CreateProject = () => {
                 </div>
               )}
             </div>
-            <small className="form-hint">Select one or more tags</small>
+            <small className="form-hint">Select 1-5 tags</small>
           </div>
 
           <div className="form-group">

@@ -47,10 +47,9 @@ const EditProject = () => {
         repo_link: data.repo_link || ''
       });
       
-      // Parse tags string into array
+      // Tags should already be an array from backend
       if (data.tags) {
-        const tagsArray = data.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
-        setSelectedTags(tagsArray);
+        setSelectedTags(Array.isArray(data.tags) ? data.tags : data.tags.split(',').map(tag => tag.trim()).filter(tag => tag));
       }
       
       setLoading(false);
@@ -68,11 +67,15 @@ const EditProject = () => {
   };
 
   const handleTagToggle = (tag) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    );
+    setSelectedTags(prev => {
+      if (prev.includes(tag)) {
+        return prev.filter(t => t !== tag);
+      } else if (prev.length < 5) {
+        return [...prev, tag];
+      } else {
+        return prev;
+      }
+    });
   };
 
   const handleRemoveTag = (tag) => {
@@ -93,12 +96,22 @@ const EditProject = () => {
       return;
     }
 
+    if (selectedTags.length === 0) {
+      setError('At least 1 tag is required');
+      return;
+    }
+
+    if (selectedTags.length > 5) {
+      setError('Maximum 5 tags allowed');
+      return;
+    }
+
     try {
       const projectData = {
         title: formData.title,
         description: formData.description,
         status: formData.status,
-        tags: selectedTags.length > 0 ? selectedTags.join(',') : null,
+        tags: selectedTags,
         repo_link: formData.repo_link || null
       };
 
@@ -220,14 +233,15 @@ const EditProject = () => {
                       ×
                     </button>
                   </span>
-                ))}
-                <button 
-                  type="button" 
-                  className="add-tag-button"
-                  onClick={() => setShowTagDropdown(!showTagDropdown)}
-                >
-                  + Add Tag
-                </button>
+                ))}  {selectedTags.length < 5 && (
+                  <button 
+                    type="button" 
+                    className="add-tag-button"
+                    onClick={() => setShowTagDropdown(!showTagDropdown)}
+                  >
+                    + Add Tag
+                  </button>
+                )}
               </div>
               {showTagDropdown && (
                 <div className="tag-dropdown">
@@ -237,6 +251,7 @@ const EditProject = () => {
                         type="checkbox"
                         checked={selectedTags.includes(tag)}
                         onChange={() => handleTagToggle(tag)}
+                        disabled={!selectedTags.includes(tag) && selectedTags.length >= 5}
                       />
                       <span>{tag}</span>
                     </label>
@@ -244,7 +259,7 @@ const EditProject = () => {
                 </div>
               )}
             </div>
-            <small className="form-hint">Select one or more tags</small>
+            <small className="form-hint">Select 1-5 tags</small>
           </div>
 
           <div className="form-group">

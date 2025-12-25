@@ -11,8 +11,9 @@ const Profile = () => {
   const { user, setUser } = useContext(UserContext);
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState('');
+  const [selectedRoles, setSelectedRoles] = useState([]);
+  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [formData, setFormData] = useState({
-    role: '',
     bio: '',
     github_profile: ''
   });
@@ -23,8 +24,8 @@ const Profile = () => {
         const userData = await getCurrentUser();
         if (userData) {
           setUser(userData);
+          setSelectedRoles(userData.roles || []);
           setFormData({
-            role: userData.role || '',
             bio: userData.bio || '',
             github_profile: userData.github_profile || ''
           });
@@ -32,8 +33,8 @@ const Profile = () => {
           navigate('/login');
         }
       } else {
+        setSelectedRoles(user.roles || []);
         setFormData({
-          role: user.role || '',
           bio: user.bio || '',
           github_profile: user.github_profile || ''
         });
@@ -48,8 +49,30 @@ const Profile = () => {
     setFormData({ ...formData, [evt.target.name]: evt.target.value });
   };
 
+  const handleRoleToggle = (role) => {
+    setSelectedRoles(prev => {
+      if (prev.includes(role)) {
+        return prev.filter(r => r !== role);
+      } else if (prev.length < 3) {
+        return [...prev, role];
+      } else {
+        return prev;
+      }
+    });
+  };
+
+  const handleRemoveRole = (role) => {
+    setSelectedRoles(prev => prev.filter(r => r !== role));
+  };
+
   const handleSubmit = async (evt) => {
     evt.preventDefault();
+    
+    if (selectedRoles.length === 0) {
+      setMessage('At least 1 role is required');
+      return;
+    }
+    
     try {
       const token = localStorage.getItem('token');
       
@@ -66,7 +89,7 @@ const Profile = () => {
           'authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          role: formData.role,
+          roles: selectedRoles,
           bio: formData.bio,
           github_profile: formData.github_profile
         })
@@ -87,12 +110,13 @@ const Profile = () => {
   };
 
   const handleCancel = () => {
+    setSelectedRoles(user.roles || []);
     setFormData({
-      role: user.role || '',
       bio: user.bio || '',
       github_profile: user.github_profile || ''
     });
     setIsEditing(false);
+    setShowRoleDropdown(false);
     setMessage('');
   };
 
@@ -122,20 +146,48 @@ const Profile = () => {
             {isEditing ? (
               <form onSubmit={handleSubmit}>
                 <div className="profile-field">
-                  <label htmlFor="role">Role:</label>
-                  <select
-                    id="role"
-                    name="role"
-                    value={formData.role}
-                    onChange={handleChange}
-                  >
-                    <option value="">Select a role</option>
-                    {rolesData.roles.map((role) => (
-                      <option key={role} value={role}>
-                        {role}
-                      </option>
-                    ))}
-                  </select>
+                  <label>Roles (1-3 required):</label>
+                  <div className="roles-selector">
+                    <div className="selected-roles">
+                      {selectedRoles.map(role => (
+                        <span key={role} className="selected-role">
+                          {role}
+                          <button 
+                            type="button" 
+                            className="remove-role"
+                            onClick={() => handleRemoveRole(role)}
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                      {selectedRoles.length < 3 && (
+                        <button 
+                          type="button" 
+                          className="add-role-button"
+                          onClick={() => setShowRoleDropdown(!showRoleDropdown)}
+                        >
+                          + Add Role
+                        </button>
+                      )}
+                    </div>
+                    {showRoleDropdown && (
+                      <div className="role-dropdown">
+                        {rolesData.roles.map(role => (
+                          <label key={role} className="role-option">
+                            <input
+                              type="checkbox"
+                              checked={selectedRoles.includes(role)}
+                              onChange={() => handleRoleToggle(role)}
+                              disabled={!selectedRoles.includes(role) && selectedRoles.length >= 3}
+                            />
+                            <span>{role}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <small className="form-hint">Select 1-3 roles</small>
                 </div>
 
                 <div className="profile-field">
@@ -170,8 +222,16 @@ const Profile = () => {
             ) : (
               <>
                 <div className="profile-field">
-                  <label>Role:</label>
-                  <p>{user.role || 'Not specified'}</p>
+                  <label>Roles:</label>
+                  <div className="roles-display">
+                    {user.roles && user.roles.length > 0 ? (
+                      user.roles.map((role, index) => (
+                        <span key={index} className="role-badge">{role}</span>
+                      ))
+                    ) : (
+                      <p>Not specified</p>
+                    )}
+                  </div>
                 </div>
 
                 <div className="profile-field">
