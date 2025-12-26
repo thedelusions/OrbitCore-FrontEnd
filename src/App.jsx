@@ -15,6 +15,7 @@ import CreateProject from './components/CreateProject/CreateProject';
 import EditProject from './components/EditProject/EditProject';
 import ProjectRequests from './components/ProjectRequests/ProjectRequests';
 import MyRequests from './components/MyRequests/MyRequests';
+import MyProjects from './components/MyProjects/MyProjects';
 import Team from './components/Team/Team'
 import Profile from './components/Profile/Profile';
 import UserProfile from './components/UserProfile/UserProfile';
@@ -50,6 +51,7 @@ const App = () => {
           <Route path="/projects/:id/edit" element={<EditProject />} />
           <Route path="/projects/:id/requests" element={<ProjectRequests />} />
           <Route path="/my/requests" element={<MyRequests />} />
+          <Route path="/my/projects" element={<MyProjects />} />
           <Route path="/projects/:id/team" element={<Team />} />
         </Routes>
       </main>
