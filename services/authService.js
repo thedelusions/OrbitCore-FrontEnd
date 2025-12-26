@@ -9,7 +9,7 @@ export const signUp = async (formData) => {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        role: formData.role,
+        roles: [formData.role],
         bio: formData.bio,
         github_profile: formData.github_profile
       })
