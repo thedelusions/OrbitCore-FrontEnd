@@ -332,6 +332,44 @@
   margin-bottom: 8px;
 }
 
+.user-roles-display {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #1a1a1f;
+  border-radius: 6px;
+  border-left: 3px solid #ff6b35;
+}
+
+.user-roles-display .roles-label {
+  font-size: 12px;
+  color: #a0a0a0;
+  font-weight: 500;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.user-roles-display .roles-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.user-roles-display .role-tag {
+  background: #ff6b35;
+  color: #f4f4f4;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.user-roles-display .no-roles-text {
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 500;
+}
+
 .project-actions .role-select {
   padding: 10px 12px;
   background: #1a1a1f;

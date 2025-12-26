@@ -173,6 +173,12 @@ const ProjectDetail = () => {
 
     if (requestSent) return;
 
+    const userRoles = user.roles || [];
+    if (!userRoles.includes(selectedRole)) {
+      setActionError('You do not have the selected role in your profile. Please update your profile first.');
+      return;
+    }
+
     try {
       setSendingRequest(true);
       if (!selectedRole) {
@@ -365,19 +371,37 @@ const ProjectDetail = () => {
             </div>
           ) : user ? (
             <div className="project-actions">
+              <div className="user-roles-display">
+                <span className="roles-label">Your Roles:</span>
+                <div className="roles-tags">
+                  {user.roles && user.roles.length > 0 ? (
+                    user.roles.map((role) => (
+                      <span key={role} className="role-tag">{role}</span>
+                    ))
+                  ) : (
+                    <span className="no-roles-text">No roles added to profile</span>
+                  )}
+                </div>
+              </div>
               <div className="role-row">
                 <select
                   className="role-select"
                   value={selectedRole}
                   onChange={(e) => setSelectedRole(e.target.value)}
+                  disabled={!user.roles || user.roles.length === 0}
                 >
                   <option value="">Select role to apply for</option>
                   {(project.roles && project.roles.length > 0
                     ? project.roles
                     : Object.values(roles).flat().sort()
-                  ).map((r) => (
-                    <option key={r} value={r}>{r}</option>
-                  ))}
+                  ).map((r) => {
+                    const isUserRole = user.roles && user.roles.includes(r);
+                    return (
+                      <option key={r} value={r} disabled={!isUserRole}>
+                        {r} {isUserRole ? ' ' : '(not in your roles)'}
+                      </option>
+                    );
+                  })}
                 </select>
                 <button
                   className="btn btn-secondary"
@@ -397,9 +421,9 @@ const ProjectDetail = () => {
               <button
                 className="btn btn-primary"
                 onClick={handleSendJoinRequest}
-                disabled={requestSent || sendingRequest || !selectedRole}
+                disabled={requestSent || sendingRequest || !selectedRole || !user.roles || user.roles.length === 0}
               >
-                {requestSent ? 'Request Sent' : sendingRequest ? 'Sending...' : 'Join Project'}
+                {requestSent ? 'Request Sent' : sendingRequest ? 'Sending...' : user.roles && user.roles.length === 0 ? 'Add Roles to Profile First' : 'Join Project'}
               </button>
             </div>
           ) : null}
