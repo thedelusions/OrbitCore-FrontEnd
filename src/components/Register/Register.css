@@ -35,6 +35,17 @@
   font-size: 14px;
 }
 
+.success-message {
+  color: #f4f4f4;
+  background: #1a2e1a;
+  border: 1px solid #4ade80;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  text-align: center;
+  font-size: 14px;
+}
+
 .form-group {
   margin-bottom: 20px;
 }
@@ -48,7 +59,8 @@
 }
 
 .form-group input,
-.form-group select {
+.form-group select,
+.form-group textarea {
   width: 100%;
   padding: 12px;
   background: #060609;
@@ -57,10 +69,18 @@
   color: #f4f4f4;
   font-size: 15px;
   transition: all 0.2s;
+  font-family: inherit;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
 }
 
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.form-group textarea:focus {
   outline: none;
   border-color: #ff6b35;
   background: #1a1a1f;
@@ -107,6 +127,113 @@
 .btn-secondary:hover {
   background: #1a1a1f;
   color: #f4f4f4;
+}
+
+.roles-selector {
+  width: 100%;
+}
+
+.selected-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  background: #060609;
+  border: 1px solid #2a2a2f;
+  border-radius: 8px;
+  min-height: 54px;
+  align-items: center;
+}
+
+.selected-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: #ff6b35;
+  color: white;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.remove-role {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0;
+  margin-left: 4px;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+
+.remove-role:hover {
+  transform: scale(1.2);
+}
+
+.add-role-button {
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px dashed #2a2a2f;
+  color: #a0a0a0;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-role-button:hover {
+  border-color: #ff6b35;
+  color: #ff6b35;
+}
+
+.role-dropdown {
+  margin-top: 8px;
+  max-height: 250px;
+  overflow-y: auto;
+  background: #060609;
+  border: 1px solid #2a2a2f;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.role-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-radius: 6px;
+}
+
+.role-option:hover {
+  background: #1a1a1f;
+}
+
+.role-option input[type="checkbox"] {
+  width: auto;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.role-option input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.role-option span {
+  color: #f4f4f4;
+  font-size: 14px;
+}
+
+.form-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #a0a0a0;
 }
 
 .footer {
