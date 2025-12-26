@@ -18,8 +18,11 @@ export const getProjectRequests = async (projectId) => {
   return res.json();
 };
 
-export const respondToRequest = async (requestId, status) => {
+export const respondToRequest = async (requestId, status, role = null) => {
   const token = localStorage.getItem('token');
+
+  const body = { status };
+  if (role) body.role = role;
 
   const res = await fetch(`${BASE_URL}/requests/${requestId}`, {
     method: 'PUT',
@@ -27,7 +30,7 @@ export const respondToRequest = async (requestId, status) => {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     },
-    body: JSON.stringify({ status })
+    body: JSON.stringify(body)
   });
 
   if (!res.ok) {
