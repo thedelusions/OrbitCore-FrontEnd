@@ -4,9 +4,11 @@ import { getProject, updateProject } from '../../../services/projectService';
 import { UserContext } from '../../contexts/UserContext';
 import Footer from '../Footer/Footer';
 import tagsData from '../../../data/tags.json';
+import rolesData from '../../../data/roles.json';
 import './EditProject.css';
 
 const AVAILABLE_TAGS = tagsData.tags;
+const AVAILABLE_ROLES = rolesData.roles;
 
 const EditProject = () => {
   const { id } = useParams();
@@ -16,6 +18,8 @@ const EditProject = () => {
   const [error, setError] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [showTagDropdown, setShowTagDropdown] = useState(false);
+  const [selectedRoles, setSelectedRoles] = useState([]);
+  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -52,6 +56,16 @@ const EditProject = () => {
         setSelectedTags(Array.isArray(data.tags) ? data.tags : data.tags.split(',').map(tag => tag.trim()).filter(tag => tag));
       }
       
+      if (data.members_roles) {
+        const roles = Array.isArray(data.members_roles) ? data.members_roles : [];
+        if (roles.length > 0 && typeof roles[0] === 'object' && roles[0].role) {
+          setSelectedRoles(roles);
+        } else if (roles.length > 0 && typeof roles[0] === 'string') {
+          //convert old format to new format
+          setSelectedRoles(roles.map(r => ({ role: r, count: 1 })));
+        }
+      }
+      
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -82,6 +96,32 @@ const EditProject = () => {
     setSelectedTags(prev => prev.filter(t => t !== tag));
   };
 
+  const handleAddRole = (roleName) => {
+    setSelectedRoles(prev => {
+      const existing = prev.find(r => r.role === roleName);
+      if (existing) {
+        return prev;
+      }
+      return [...prev, { role: roleName, count: 1 }];
+    });
+  };
+
+  const handleRoleCountChange = (roleName, delta) => {
+    setSelectedRoles(prev => {
+      return prev.map(r => {
+        if (r.role === roleName) {
+          const newCount = Math.max(1, r.count + delta);
+          return { ...r, count: newCount };
+        }
+        return r;
+      });
+    });
+  };
+
+  const handleRemoveRole = (roleName) => {
+    setSelectedRoles(prev => prev.filter(r => r.role !== roleName));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -107,12 +147,16 @@ const EditProject = () => {
     }
 
     try {
+      const totalMembers = selectedRoles.reduce((sum, roleObj) => sum + roleObj.count, 0);
+      
       const projectData = {
         title: formData.title,
         description: formData.description,
         status: formData.status,
         tags: selectedTags,
-        repo_link: formData.repo_link || null
+        repo_link: formData.repo_link || null,
+        required_members: totalMembers > 0 ? totalMembers : null,
+        members_roles: selectedRoles
       };
 
       await updateProject(id, projectData);
@@ -260,6 +304,70 @@ const EditProject = () => {
               )}
             </div>
             <small className="form-hint">Select 1-5 tags</small>
+          </div>
+
+          <div className="form-group">
+            <label>What roles are you looking for?</label>
+            <div className="roles-selector">
+              <div className="selected-roles-list">
+                {selectedRoles.map(roleObj => (
+                  <div key={roleObj.role} className="role-count-item">
+                    <span className="role-name">{roleObj.role}</span>
+                    <div className="role-controls">
+                      <button 
+                        type="button" 
+                        className="count-button"
+                        onClick={() => handleRoleCountChange(roleObj.role, -1)}
+                      >
+                        −
+                      </button>
+                      <span className="role-count">{roleObj.count}</span>
+                      <button 
+                        type="button" 
+                        className="count-button"
+                        onClick={() => handleRoleCountChange(roleObj.role, 1)}
+                      >
+                        +
+                      </button>
+                      <button 
+                        type="button" 
+                        className="remove-role-button"
+                        onClick={() => handleRemoveRole(roleObj.role)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="role-dropdown-container">
+                <button 
+                  type="button" 
+                  className="add-tag-button"
+                  onClick={() => setShowRoleDropdown(!showRoleDropdown)}
+                >
+                  + Add Role
+                </button>
+                {showRoleDropdown && (
+                  <div className="tag-dropdown">
+                    {AVAILABLE_ROLES.filter(role => !selectedRoles.find(r => r.role === role)).map(role => (
+                      <button
+                        key={role}
+                        type="button"
+                        className="role-dropdown-item"
+                        onClick={() => {
+                          handleAddRole(role);
+                          setShowRoleDropdown(false);
+                        }}
+                      >
+                        {role}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <small className="form-hint">Optional: Select the roles needed for your team and specify quantities</small>
           </div>
 
           <div className="form-group">

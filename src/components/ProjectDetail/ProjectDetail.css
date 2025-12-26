@@ -220,6 +220,60 @@
   text-decoration: underline;
 }
 
+.project-team-needs {
+  margin-bottom: 32px;
+  padding: 20px;
+  background: #1a1a1f;
+  border: 2px solid #2a2a2f;
+  border-radius: 8px;
+}
+
+.project-team-needs h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #f4f4f4;
+  margin-bottom: 16px;
+}
+
+.team-need-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.team-need-item:last-child {
+  margin-bottom: 0;
+}
+
+.need-label {
+  font-size: 14px;
+  color: #a0a0a0;
+  font-weight: 500;
+}
+
+.need-value {
+  font-size: 15px;
+  color: #f4f4f4;
+  font-weight: 600;
+}
+
+.roles-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.role-badge {
+  padding: 6px 12px;
+  background: #ff6b35;
+  color: white;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
 .project-meta {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

@@ -297,6 +297,26 @@ const ProjectDetail = () => {
             </div>
           )}
 
+          {project.members_roles && project.members_roles.length > 0 && (
+            <div className="project-team-needs">
+              <h3>Team Needs</h3>
+              <div className="team-need-item">
+                <span className="need-label">Looking for:</span>
+                <div className="roles-list">
+                  {project.members_roles.map((roleItem, index) => {
+                    const roleName = typeof roleItem === 'string' ? roleItem : roleItem.role;
+                    const count = typeof roleItem === 'object' && roleItem.count ? roleItem.count : 1;
+                    return (
+                      <span key={index} className="role-badge">
+                        {roleName} {count > 1 && `(${count})`}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="project-meta">
             <div className="meta-item">
               <span className="meta-label">Owner:</span>

@@ -134,6 +134,17 @@ const Projects = () => {
                 </div>
               )}
               
+              {project.members_roles && project.members_roles.length > 0 && (
+                <div className="project-team-info">
+                  <span className="team-info-item">
+                    {project.members_roles.reduce((total, roleItem) => {
+                      const count = typeof roleItem === 'object' && roleItem.count ? roleItem.count : 1;
+                      return total + count;
+                    }, 0)} positions
+                  </span>
+                </div>
+              )}
+              
               <div className="project-footer">
                 <div className="vote-stats">
                   <span className="upvotes">↑ {project.upvotes || 0}</span>
