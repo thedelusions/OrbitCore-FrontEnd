@@ -51,16 +51,19 @@ const RegisterForm = () => {
       setMessage('At least 1 role is required');
       return;
     }
+    if (password !== passwordConf) {
+      setMessage('Passwords do not match');
+      return;
+    }
     
     try {
       const data = await signUp({ ...formData, roles: selectedRoles });
-      console.log('Registration response:', data);
+      
       
      
-      setMessage('Registration successful! Please log in.');
-      setTimeout(() => {
-        navigate('/login');
-      }, 1500);
+      localStorage.setItem('token', data.token);
+      setUser(null);
+      navigate('/');
       
     } catch (err) {
       console.error('Registration error:', err);
