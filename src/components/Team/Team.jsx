@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from "react-router";
 import { getProjectTeam, removeTeamMember, getTeamComments, addTeamComment, deleteTeamComment} from "../../../services/teamService";
+import { getUserById } from "../../../services/userService";
 import { UserContext } from '../../contexts/UserContext';
 import './Team.css';
 import Footer from '../Footer/Footer';
@@ -18,11 +19,47 @@ const Team = () => {
   useEffect(() => {
     const fetchTeamInfo = async () => {
       try {
-        
         const teamInfo = await getProjectTeam(id);
-        setTeamMembers(teamInfo);
-        const commentInfo = await getTeamComments(id)
-        setComments(commentInfo)
+        
+        const teamWithUserData = await Promise.all(
+          teamInfo.map(async (member) => {
+            try {
+              const userData = await getUserById(member.user_id);
+              return {
+                ...member,
+                user: userData
+              };
+            } catch (err) {
+              console.error(`Failed to fetch user ${member.user_id}:`, err);
+              return {
+                ...member,
+                user: null
+              };
+            }
+          })
+        );
+        
+        setTeamMembers(teamWithUserData);
+        
+        const commentInfo = await getTeamComments(id);
+        const commentsWithUserData = await Promise.all(
+          commentInfo.map(async (comment) => {
+            try {
+              const userData = await getUserById(comment.user_id);
+              return {
+                ...comment,
+                user: userData
+              };
+            } catch (err) {
+              console.error(`Failed to fetch user ${comment.user_id}:`, err);
+              return {
+                ...comment,
+                user: null
+              };
+            }
+          })
+        );
+        setComments(commentsWithUserData);
        
       } catch (err) {
         setError(err.message);
@@ -52,12 +89,13 @@ const Team = () => {
 const handleAddingComment = async (e) => {
   e.preventDefault();
   try {
-    const newComment = await addTeamComment(id, {content: commentText})
-    setComments(prev => [...prev, newComment])
-    setCommentText("")
+    const newComment = await addTeamComment(id, {content: commentText});
+    const userData = await getUserById(newComment.user_id);
+    setComments(prev => [...prev, { ...newComment, user: userData }]);
+    setCommentText("");
   }
   catch (err) {
-    alert(err.message)
+    alert(err.message);
   }
 }
 const timeAgo = (date) => {
@@ -96,10 +134,17 @@ const handleDeleteComment = async (commentId) => {
       <div className="team-grid">
         {teamMembers.map((member) => (
           <div key={`${member.project_id}-${member.user_id}`} className="team-member-card">
-            <h3>{member.user?.username}</h3>
+            <h3>
+              <a 
+                href={`/users/${member.user_id}`}
+                onClick={(e) => { e.preventDefault(); navigate(`/users/${member.user_id}`); }}
+                className="member-link"
+              >
+                {member.user?.username || 'Unknown'}
+              </a>
+            </h3>
             <p><strong>Email:</strong> {member.user?.email}</p>
             <p><strong>Role:</strong> {member.role}</p>
-            {member.user?.bio && <p><strong>Bio:</strong> {member.user.bio}</p>}
             {member.user?.github_profile && (
               <p>
                 
@@ -120,15 +165,12 @@ const handleDeleteComment = async (commentId) => {
       {teamMembers.length === 0 && (
         <p className="no-teams">No team members found.</p>
       )}
-      <h2>Team comments</h2>
+      <h2>Team Chat</h2>
       <div className='comments-list'>
         <div className="comments-list">
         {comments.map(comment => (
-          <div key={comment.id} className="comment">
-            <div className='comment-header'> 
-            <strong className='comment-user'>{comment.user?.username}</strong>
-            <span className='comment-time'>{timeAgo(comment.created_at)}</span>
-            </div>
+  <div key={comment.id} className="comment">
+    <strong>{comment.user?.username}</strong>
     <p>{comment.content}</p>
 
     {(comment.user_id === currentUserId || isOwner) && (
@@ -145,7 +187,7 @@ const handleDeleteComment = async (commentId) => {
 ))}
       </div> 
       <form onSubmit={handleAddingComment} className="comment-form">
-        <textarea value={commentText} onChange={e => setCommentText(e.target.value)} placeholder="Write a comment..."/>
+        <textarea value={commentText} onChange={e => setCommentText(e.target.value)} placeholder="Write a massage..."/>
         <button type="submit">Add Comment</button>
       </form>
       </div>
