@@ -81,7 +81,7 @@ const RegisterForm = () => {
     <main className='main'>
       <div className="form-container">
         <div className="form-wrapper">
-        <h1>Sign Up</h1>
+        <h1>Register</h1>
         {message && <p className={message.includes('successful') ? 'success-message' : 'error-message'}>{message}</p>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
