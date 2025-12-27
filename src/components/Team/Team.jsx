@@ -60,6 +60,23 @@ const handleAddingComment = async (e) => {
     alert(err.message)
   }
 }
+const timeAgo = (date) => {
+    const seconds = Math.floor((new Date() - new Date(date)) / 1000)
+    const intervals = [
+    { label: 'year', seconds: 31536000 },
+    { label: 'month', seconds: 2592000 },
+    { label: 'day', seconds: 86400 },
+    { label: 'hour', seconds: 3600 },
+    { label: 'minute', seconds: 60 }
+  ];
+  for (let i of intervals) {
+    const count = Math.floor(seconds / i.seconds)
+    if (count >= 1){
+      return `${count} ${i.label}${count > 1 ? 's' : ''} ago`
+    }
+  }
+  return 'Just now';
+  }
 const handleDeleteComment = async (commentId) => {
   try {
     await deleteTeamComment(id, commentId)
@@ -107,8 +124,11 @@ const handleDeleteComment = async (commentId) => {
       <div className='comments-list'>
         <div className="comments-list">
         {comments.map(comment => (
-  <div key={comment.id} className="comment">
-    <strong>{comment.user?.username}</strong>
+          <div key={comment.id} className="comment">
+            <div className='comment-header'> 
+            <strong className='comment-user'>{comment.user?.username}</strong>
+            <span className='comment-time'>{timeAgo(comment.created_at)}</span>
+            </div>
     <p>{comment.content}</p>
 
     {(comment.user_id === currentUserId || isOwner) && (
