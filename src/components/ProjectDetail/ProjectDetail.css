@@ -370,6 +370,35 @@
   font-weight: 500;
 }
 
+.no-matching-roles-message {
+  background: #3d2a1a;
+  border: 2px solid #ff6b35;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.no-matching-roles-message p {
+  color: #f4f4f4;
+  font-size: 14px;
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.no-matching-roles-message p:first-child {
+  margin-top: 0;
+  font-weight: 500;
+}
+
+.required-roles-text {
+  color: #ff8456;
+  font-size: 13px !important;
+}
+
+.required-roles-text strong {
+  color: #ff6b35;
+}
+
 .project-actions .role-select {
   padding: 10px 12px;
   background: #1a1a1f;

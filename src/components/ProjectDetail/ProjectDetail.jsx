@@ -383,48 +383,68 @@ const ProjectDetail = () => {
                   )}
                 </div>
               </div>
-              <div className="role-row">
-                <select
-                  className="role-select"
-                  value={selectedRole}
-                  onChange={(e) => setSelectedRole(e.target.value)}
-                  disabled={!user.roles || user.roles.length === 0}
-                >
-                  <option value="">Select role to apply for</option>
-                  {(project.roles && project.roles.length > 0
-                    ? project.roles
-                    : Object.values(roles).flat().sort()
-                  ).map((r) => {
-                    const isUserRole = user.roles && user.roles.includes(r);
-                    return (
-                      <option key={r} value={r} disabled={!isUserRole}>
-                        {r} {isUserRole ? ' ' : '(not in your roles)'}
-                      </option>
-                    );
-                  })}
-                </select>
-                <button
-                  className="btn btn-secondary"
-                  type="button"
-                  onClick={() => { setSelectedRole(''); setMessage(''); }}
-                >
-                  Clear
-                </button>
-              </div>
-              <textarea
-                className="request-message"
-                placeholder="Optional message (explain why you want to join / relevant experience)"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                rows={3}
-              />
-              <button
-                className="btn btn-primary"
-                onClick={handleSendJoinRequest}
-                disabled={requestSent || sendingRequest || !selectedRole || !user.roles || user.roles.length === 0}
-              >
-                {requestSent ? 'Request Sent' : sendingRequest ? 'Sending...' : user.roles && user.roles.length === 0 ? 'Add Roles to Profile First' : 'Join Project'}
-              </button>
+              
+              {(() => {
+                const projectRequiredRoles = project.members_roles
+                  ? project.members_roles.map(r => typeof r === 'string' ? r : r.role)
+                  : [];
+                const userRoles = user.roles || [];
+                const matchingRoles = userRoles.filter(role => projectRequiredRoles.includes(role));
+                const hasMatchingRoles = matchingRoles.length > 0;
+                
+                return (
+                  <>
+                    {!hasMatchingRoles && projectRequiredRoles.length > 0 && (
+                      <div className="no-matching-roles-message">
+                        <p>You don't have any of the required roles for this project.</p>
+                        <p className="required-roles-text">
+                          This project is looking for: <strong>{projectRequiredRoles.join(', ')}</strong>
+                        </p>
+                      </div>
+                    )}
+                    
+                    {hasMatchingRoles && (
+                      <>
+                        <div className="role-row">
+                          <select
+                            className="role-select"
+                            value={selectedRole}
+                            onChange={(e) => setSelectedRole(e.target.value)}
+                          >
+                            <option value="">Select role to apply for</option>
+                            {matchingRoles.map((r) => (
+                              <option key={r} value={r}>
+                                {r}
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            className="btn btn-secondary"
+                            type="button"
+                            onClick={() => { setSelectedRole(''); setMessage(''); }}
+                          >
+                            Clear
+                          </button>
+                        </div>
+                        <textarea
+                          className="request-message"
+                          placeholder="Optional message (explain why you want to join / relevant experience)"
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                          rows={3}
+                        />
+                        <button
+                          className="btn btn-primary"
+                          onClick={handleSendJoinRequest}
+                          disabled={requestSent || sendingRequest || !selectedRole}
+                        >
+                          {requestSent ? 'Request Sent' : sendingRequest ? 'Sending...' : 'Join Project'}
+                        </button>
+                      </>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           ) : null}
         </div>
