@@ -3,47 +3,76 @@ import { useNavigate } from 'react-router';
 import { signUp } from '../../../services/authService';
 import { UserContext } from '../../contexts/UserContext';
 import Footer from '../Footer/Footer';
-import roles from '../../../data/roles.json';
+import rolesData from '../../../data/roles.json';
 import './Register.css';
 
 const RegisterForm = () => {
   const navigate = useNavigate();
   const { setUser } = useContext(UserContext);
   const [message, setMessage] = useState('');
+  const [selectedRoles, setSelectedRoles] = useState([]);
+  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     passwordConf: '',
-    role: '',
     bio: '',
     github_profile: ''
   });
 
 
-  const { username, email, password, passwordConf, role, bio, github_profile } = formData;
+  const { username, email, password, passwordConf, bio, github_profile } = formData;
   const handleChange = (evt) => {
     setMessage('');
     setFormData({ ...formData, [evt.target.name]: evt.target.value });
   };
 
+  const handleRoleToggle = (role) => {
+    setSelectedRoles(prev => {
+      if (prev.includes(role)) {
+        return prev.filter(r => r !== role);
+      } else if (prev.length < 3) {
+        return [...prev, role];
+      } else {
+        return prev;
+      }
+    });
+  };
+
+  const handleRemoveRole = (role) => {
+    setSelectedRoles(prev => prev.filter(r => r !== role));
+  };
+
  const handleSubmit = async (evt) => {
     evt.preventDefault();
+    
+    if (selectedRoles.length === 0) {
+      setMessage('At least 1 role is required');
+      return;
+    }
+    if (password !== passwordConf) {
+      setMessage('Passwords do not match');
+      return;
+    }
+    
     try {
-      const data = await signUp(formData);
-      console.log('Registration response:', data);
-      // Store user data if it's returned
-      if (data.user) {
-        setUser(data.user);
-      }
-      navigate('/login');
+      const data = await signUp({ ...formData, roles: selectedRoles });
+      
+      
+     
+      localStorage.setItem('token', data.token);
+      setUser(null);
+      navigate('/');
+      
     } catch (err) {
-      setMessage(err.message);
+      console.error('Registration error:', err);
+      setMessage(err.message || 'Registration failed. Please check your information.');
     }
   };
 
   const isFormInvalid = () => {
-    return !(username && email && password && password === passwordConf && role && bio && github_profile);
+    return !(username && email && password && password === passwordConf && selectedRoles.length > 0);
   };
 
   return (
@@ -52,7 +81,7 @@ const RegisterForm = () => {
       <div className="form-container">
         <div className="form-wrapper">
         <h1>Sign Up</h1>
-        {message && <p className="error-message">{message}</p>}
+        {message && <p className={message.includes('successful') ? 'success-message' : 'error-message'}>{message}</p>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor='username'>Username</label>
@@ -99,43 +128,70 @@ const RegisterForm = () => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor='github_profile'>Github Profile Link</label>
-            <input
-              type='text'
-              id='github_profile'
-              value={github_profile}
-              name='github_profile'
-              onChange={handleChange}
-              required
-            />
-          </div>
-           <div className="form-group">
             <label htmlFor='bio'>Bio</label>
-            <input
-              type='text'
+            <textarea
               id='bio'
               value={bio}
               name='bio'
               onChange={handleChange}
-              required
+              rows="3"
+              placeholder="Tell us about yourself..."
             />
           </div>
           <div className="form-group">
-            <label htmlFor='role'>Role</label>
-            <select
-              id='role'
-              value={role}
-              name='role'
+            <label htmlFor='github_profile'>Github Profile Link</label>
+            <input
+              type='url'
+              id='github_profile'
+              value={github_profile}
+              name='github_profile'
               onChange={handleChange}
-              required
-            >
-              <option value=''>Select your role</option>
-              {Object.values(roles).flat().sort().map((roles) => (
-                <option key={roles} value={roles}>
-                  {roles}
-                </option>
-              ))}
-            </select>
+              placeholder="https://github.com/username"
+            />
+          </div>
+          <div className="form-group">
+            <label>Roles (1-3 required)</label>
+            <div className="roles-selector">
+              <div className="selected-roles">
+                {selectedRoles.map(role => (
+                  <span key={role} className="selected-role">
+                    {role}
+                    <button 
+                      type="button" 
+                      className="remove-role"
+                      onClick={() => handleRemoveRole(role)}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                {selectedRoles.length < 3 && (
+                  <button 
+                    type="button" 
+                    className="add-role-button"
+                    onClick={() => setShowRoleDropdown(!showRoleDropdown)}
+                  >
+                    + Add Role
+                  </button>
+                )}
+              </div>
+              {showRoleDropdown && (
+                <div className="role-dropdown">
+                  {rolesData.roles.map(role => (
+                    <label key={role} className="role-option">
+                      <input
+                        type="checkbox"
+                        checked={selectedRoles.includes(role)}
+                        onChange={() => handleRoleToggle(role)}
+                        disabled={!selectedRoles.includes(role) && selectedRoles.length >= 3}
+                      />
+                      <span>{role}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+            <small className="form-hint">Select 1-3 roles that best describe you</small>
           </div>
           <div className="form-buttons">
             <button type="submit" className="btn-primary" disabled={isFormInvalid()}>Register</button>

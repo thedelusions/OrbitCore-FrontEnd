@@ -19,7 +19,7 @@ const Landing = () => {
             Get Started
           </button>
           <button className='btn btn-secondary' onClick={() => navigate('/login')}>
-            Sign In
+            Login
           </button>
         </div>
       </section>

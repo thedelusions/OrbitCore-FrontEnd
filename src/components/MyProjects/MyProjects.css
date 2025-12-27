@@ -1,0 +1,77 @@
+.my-projects-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: sans-serif;
+  color: #f0f0f0;
+}
+
+.my-projects-container h1 {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.my-projects-container > p {
+  color: #b0b0b0;
+  font-size: 15px;
+  margin-bottom: 32px;
+}
+
+.back-button {
+  background: transparent;
+  color: #b0b0b0;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 32px;
+  transition: 0.2s;
+}
+.back-button:hover { color: #fff; }
+
+.my-projects-list { display: flex; flex-direction: column; gap: 24px; }
+
+.project-card {
+  background: #12121a;
+  border: 1.5px solid #2e2e37;
+  border-radius: 12px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: 0.3s;
+}
+.project-card:hover { border-color: #ff7a50; background: #1f1f28; }
+
+.project-header { display: flex; justify-content: space-between; align-items: center; }
+.project-header h3 { margin: 0; font-size: 22px; }
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.status-planning { background: #23233f; color: #a78bfa; }
+.status-active { background: #12321c; color: #4ade80; }
+.status-open { background: #1b3350; color: #60a5fa; }
+.status-completed { background: #33301f; color: #fcd34d; }
+
+.project-description { color: #b0b0b0; font-size: 14px; line-height: 1.6; }
+.project-details { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap: 16px; }
+.detail-label { font-size: 12px; color: #b0b0b0; text-transform: uppercase; }
+.detail-value { font-size: 14px; color: #f0f0f0; }
+
+.project-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag { background: #1f1f28; color: #ff7a50; padding: 6px 12px; border-radius: 8px; font-size: 12px; border: 1px solid #ff7a50; }
+
+.project-actions { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 16px; border-top: 1px solid #2e2e37; }
+.btn { padding: 10px 16px; border-radius: 10px; font-size: 13px; cursor: pointer; transition: 0.3s; }
+.btn-primary { background: #ff7a50; color: #fff; }
+.btn-primary:hover { background: #ff9473; transform: translateY(-2px); }
+.btn-secondary { background: transparent; color: #ff7a50; border: 2px solid #ff7a50; }
+.btn-secondary:hover { background: #ff7a50; color: #fff; }
+
+@media (max-width:768px){
+  .project-header { flex-direction: column; align-items: flex-start; }
+  .project-details { grid-template-columns: repeat(2,1fr); }
+  .btn { padding: 8px 12px; font-size: 12px; }
+}

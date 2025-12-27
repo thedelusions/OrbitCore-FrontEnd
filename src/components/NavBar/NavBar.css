@@ -1,18 +1,13 @@
 nav {
   background: #0f0f14;
   border-bottom: 1px solid #2a2a2f;
-  padding: 16px 32px;
+  padding: 16px 0;
   position: sticky;
   top: 0;
   z-index: 100;
   backdrop-filter: blur(10px);
-}
-
-nav p {
-  margin: 0;
-  color: #f4f4f4;
-  font-size: 15px;
-  font-weight: 500;
+  flex-shrink: 0;
+  width: 100%;
 }
 
 .navbar {
@@ -21,14 +16,18 @@ nav p {
   align-items: center;
   max-width: 1400px;
   margin: 0 auto;
+  padding: 0 32px;
+  min-height: 60px;
 }
 
 .nav-logo {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
   color: #f4f4f4;
   text-decoration: none;
   transition: color 0.2s;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
 }
 
 .nav-logo:hover {
@@ -37,13 +36,16 @@ nav p {
 
 .nav-menu {
   display: flex;
-  gap: 32px;
+  gap: 40px;
   list-style: none;
   align-items: center;
+  margin: 0;
+  padding: 0;
 }
 
 .nav-menu li {
   margin: 0;
+  white-space: nowrap;
 }
 
 .nav-menu a {
@@ -53,6 +55,8 @@ nav p {
   font-weight: 500;
   transition: color 0.2s;
   position: relative;
+  padding: 8px 0;
+  display: block;
 }
 
 .nav-menu a:hover {
@@ -62,7 +66,7 @@ nav p {
 .nav-menu a::after {
   content: '';
   position: absolute;
-  bottom: -4px;
+  bottom: 4px;
   left: 0;
   width: 0;
   height: 2px;

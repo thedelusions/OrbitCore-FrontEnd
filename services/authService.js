@@ -9,20 +9,31 @@ export const signUp = async (formData) => {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        role: formData.role,
-        bio: formData.bio,
-        github_profile: formData.github_profile
+        roles: formData.roles || [],
+        bio: formData.bio || null,
+        github_profile: formData.github_profile || null
       })
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.detail || 'Registration failed');
+      console.error('Registration error response:', error);
+      
+      if (error.detail && Array.isArray(error.detail)) {
+        const errorMessages = error.detail.map(err => {
+          const field = err.loc ? err.loc[err.loc.length - 1] : 'unknown';
+          return `${field}: ${err.msg}`;
+        }).join(', ');
+        throw new Error(errorMessages);
+      }
+      
+      throw new Error(error.detail || error.message || 'Registration failed');
     }
 
     const data = await response.json();
     return data;
   } catch (err) {
+    console.error('Registration error:', err);
     throw err;
   }
 };
@@ -44,11 +55,45 @@ export const signIn = async (credentials) => {
     }
 
     const data = await response.json();
+    
     // Store token
-    localStorage.setItem('token', data.token);
+    if (data.access_token) {
+      localStorage.setItem('token', data.access_token);
+    } else if (data.token) {
+      localStorage.setItem('token', data.token);
+    }
+    
     return data;
   } catch (err) {
     throw err;
+  }
+};
+
+export const getCurrentUser = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      return null;
+    }
+
+    const response = await fetch(`${BASE_URL}/profile`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const userData = await response.json();
+    return userData;
+  } catch (err) {
+    console.error('Error fetching current user:', err);
+    return null;
   }
 };
 
