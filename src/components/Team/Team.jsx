@@ -190,7 +190,7 @@ const handleDeleteComment = async (commentId) => {
         <textarea value={commentText} onChange={e => setCommentText(e.target.value)} placeholder="Write a massage..."/>
         <button type="submit">Send Massage</button>
       </form>
-      </div>w
+      </div>
     </div>
     <Footer />
     </>
