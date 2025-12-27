@@ -70,7 +70,26 @@ const Team = () => {
 
     fetchTeamInfo();
   }, [id]);
+const timeAgo = (date) => {
+  const seconds = Math.floor((new Date() - new Date(date)) / 1000);
 
+  const intervals = [
+    { label: 'year', seconds: 31536000 },
+    { label: 'month', seconds: 2592000 },
+    { label: 'day', seconds: 86400 },
+    { label: 'hour', seconds: 3600 },
+    { label: 'minute', seconds: 60 }
+  ];
+
+  for (let i of intervals) {
+    const count = Math.floor(seconds / i.seconds);
+    if (count >= 1) {
+      return `${count} ${i.label}${count > 1 ? 's' : ''} ago`;
+    }
+  }
+
+  return 'Just now';
+};  
   const handleRemovingMember = async (userId) => {
     try {
       await removeTeamMember(id, userId)
@@ -98,6 +117,7 @@ const handleAddingComment = async (e) => {
     alert(err.message);
   }
 }
+
 const handleDeleteComment = async (commentId) => {
   try {
     await deleteTeamComment(id, commentId)
@@ -153,24 +173,10 @@ const handleDeleteComment = async (commentId) => {
         <div className="comments-list">
         {comments.map(comment => (
   <div key={comment.id} className="comment">
-    <strong className='message-username'>
-      <a 
-        href={`/users/${comment.user_id}`}
-        onClick={(e) => { e.preventDefault(); navigate(`/users/${comment.user_id}`); }}
-        className="member-link"
-      >
-        {comment.user?.username}
-      </a>
-    </strong>
+    <strong>{comment.user?.username}</strong>
     <span className="comment-time">
-      {new Date(comment.created_at).toLocaleString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric', 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      })}
-    </span>
+        {timeAgo(comment.created_at)}
+      </span>
     <p>{comment.content}</p>
 
     {(comment.user_id === currentUserId || isOwner) && (
