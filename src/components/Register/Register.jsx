@@ -1,9 +1,10 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router';
-import { signUp } from '../../../services/authService';
+import { signUp, getCurrentUser } from '../../../services/authService';
 import { UserContext } from '../../contexts/UserContext';
 import Footer from '../Footer/Footer';
 import rolesData from '../../../data/roles.json';
+
 import './Register.css';
 
 const RegisterForm = () => {
@@ -20,7 +21,7 @@ const RegisterForm = () => {
     bio: '',
     github_profile: ''
   });
-
+  
 
   const { username, email, password, passwordConf, bio, github_profile } = formData;
   const handleChange = (evt) => {
@@ -51,10 +52,10 @@ const RegisterForm = () => {
       setMessage('At least 1 role is required');
       return;
     }
-    if (password !== passwordConf) {
-      setMessage('Passwords do not match');
+    if (password.length < 8) {
+      setMessage('Password must be at least 8 characters');
       return;
-    }
+  }
     
     try {
       const data = await signUp({ ...formData, roles: selectedRoles });
@@ -62,9 +63,9 @@ const RegisterForm = () => {
       
      
       localStorage.setItem('token', data.token);
-      setUser(null);
+      const user = await getCurrentUser();
+      setUser(user);
       navigate('/');
-      
     } catch (err) {
       console.error('Registration error:', err);
       setMessage(err.message || 'Registration failed. Please check your information.');
@@ -80,7 +81,7 @@ const RegisterForm = () => {
     <main className='main'>
       <div className="form-container">
         <div className="form-wrapper">
-        <h1>Sign Up</h1>
+        <h1>Register</h1>
         {message && <p className={message.includes('successful') ? 'success-message' : 'error-message'}>{message}</p>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
